@@ -21,7 +21,7 @@ use EDG::WP4::CCM::Path;
 use CCMTest qw (eok make_file);
 
 my ($resource, $path, $string, $type);
-my ($derivation, $checksum, $description, $value);
+my ($checksum, $description, $value);
 
 my ($cm, $config, $cache_dir, $profile, %hash, $key, @array, $i, $name);
 
@@ -91,16 +91,15 @@ sub gen_dbm ($$) {
     # value
     $key = 0x00000001;
     $hash{pack("L",$key)} = chr(48).chr(0).chr(49);
+
     # type
     $key = 0x10000001;
     $hash{pack("L",$key)} = "list";
-    # derivation
-    $key = 0x20000001;
-    $derivation = "lxplus.tpl,hardware.tpl,lxplust_025.tpl";
-    $hash{pack("L",$key)} = $derivation;
+
     # checksum
     $key = 0x30000001;
-    $hash{pack("L",$key)} = md5_hex($derivation);;
+    $hash{pack("L",$key)} = md5_hex($key.$value);
+
     # description
     $key = 0x40000001;
     $hash{pack("L",$key)} = "an example of list";
@@ -108,16 +107,15 @@ sub gen_dbm ($$) {
     # value
     $key = 0x00000002;
     $hash{pack("L",$key)} = "element 0";
+
     # type
     $key = 0x10000002;
     $hash{pack("L",$key)} = "string";
-    # derivation
-    $key = 0x20000002;
-    $derivation = "lxplus.tpl,hardware.tpl,lxplust_025.tpl";
-    $hash{pack("L",$key)} = $derivation;
+
     # checksum
     $key = 0x30000002;
-    $hash{pack("L",$key)} = md5_hex($derivation);;
+    $hash{pack("L",$key)} = md5_hex($key.$value);
+
     # description
     $key = 0x40000002;
     $hash{pack("L",$key)} = "an example of string";
@@ -125,16 +123,15 @@ sub gen_dbm ($$) {
     # value
     $key = 0x00000003;
     $hash{pack("L",$key)} = "element 1";
+
     # type
     $key = 0x10000003;
     $hash{pack("L",$key)} = "string";
-    # derivation
-    $key = 0x20000003;
-    $derivation = "lxplus.tpl,hardware.tpl,lxplust_025.tpl";
-    $hash{pack("L",$key)} = $derivation;
+
     # checksum
     $key = 0x30000003;
-    $hash{pack("L",$key)} = md5_hex($derivation);;
+    $hash{pack("L",$key)} = md5_hex($key.$value);
+
     # description
     $key = 0x40000003;
     $hash{pack("L",$key)} = "an example of string";
@@ -147,13 +144,11 @@ sub gen_dbm ($$) {
     # type
     $key = 0x10000004;
     $hash{pack("L",$key)} = "nlist";
-    # derivation
-    $key = 0x20000004;
-    $derivation = "lxplus.tpl,hardware.tpl,lxplust_025.tpl";
-    $hash{pack("L",$key)} = $derivation;
+
     # checksum
     $key = 0x30000004;
-    $hash{pack("L",$key)} = md5_hex($derivation);;
+    $hash{pack("L",$key)} = md5_hex($key.$value);
+
     # description
     $key = 0x40000004;
     $hash{pack("L",$key)} = "an example of nlist";
@@ -161,16 +156,15 @@ sub gen_dbm ($$) {
     # value
     $key = 0x00000005;
     $hash{pack("L",$key)} = "element zero";
+
     # type
     $key = 0x10000005;
     $hash{pack("L",$key)} = "string";
-    # derivation
-    $key = 0x20000005;
-    $derivation = "lxplus.tpl,hardware.tpl,lxplust_025.tpl";
-    $hash{pack("L",$key)} = $derivation;
+
     # checksum
     $key = 0x30000005;
-    $hash{pack("L",$key)} = md5_hex($derivation);;
+    $hash{pack("L",$key)} = md5_hex($key.$value);;
+
     # description
     $key = 0x40000005;
     $hash{pack("L",$key)} = "an example of string";
@@ -178,16 +172,15 @@ sub gen_dbm ($$) {
     # value
     $key = 0x00000006;
     $hash{pack("L",$key)} = "element one";
+
     # type
     $key = 0x10000006;
     $hash{pack("L",$key)} = "string";
-    # derivation
-    $key = 0x20000006;
-    $derivation = "lxplus.tpl,hardware.tpl,lxplust_025.tpl";
-    $hash{pack("L",$key)} = $derivation;
+
     # checksum
     $key = 0x30000006;
-    $hash{pack("L",$key)} = md5_hex($derivation);;
+    $hash{pack("L",$key)} = md5_hex($key.$value);;
+
     # description
     $key = 0x40000006;
     $hash{pack("L",$key)} = "an example of string";
@@ -232,14 +225,9 @@ ok($string eq "/path/to/list", "Resource->getPath()");
 $type = $resource->getType();
 ok($type == EDG::WP4::CCM::CacheManager::Resource->LIST, "Resource->getType()");
 
-# test getDerivation()
-$derivation = $resource->getDerivation();
-ok($derivation eq "lxplus.tpl,hardware.tpl,lxplust_025.tpl",
-   "Resource->getDerivation()");
-
 # test getChecksum()
 $checksum = $resource->getChecksum();
-ok($checksum eq md5_hex($derivation), "Resource->getChecksum()");
+ok($checksum eq md5_hex($key.$value), "Resource->getChecksum()");
 
 # test getDescription()
 $description = $resource->getDescription();

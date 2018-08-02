@@ -32,7 +32,6 @@ sub gen_dbm ($$) {
     my ($cache_dir, $profile) = @_;
     my (%hash);
     my ($key, $val, $active);
-    my ($derivation);
 
     # remove previous cache dir
 
@@ -66,13 +65,9 @@ sub gen_dbm ($$) {
     # type
     $key = 0x10000001;
     $hash{pack("L", $key)} = "string";
-    # derivation
-    $key = 0x20000001;
-    $derivation = "lxplus.tpl,hardware.tpl,lxplust_025.tpl";
-    $hash{pack("L", $key)} = $derivation;
     # checksum
     $key = 0x30000001;
-    $hash{pack("L", $key)} = md5_hex($derivation);
+    $hash{pack("L", $key)} = md5_hex($key.$value);
     # description
     $key = 0x40000001;
     $hash{pack("L", $key)} = "an example of string";
@@ -83,13 +78,9 @@ sub gen_dbm ($$) {
     # type
     $key = 0x10000002;
     $hash{pack("L", $key)} = "list";
-    # derivation
-    $key = 0x20000002;
-    $derivation = "lxplus.tpl,hardware.tpl,lxplust_025.tpl";
-    $hash{pack("L", $key)} = $derivation;
     # checksum
     $key = 0x30000002;
-    $hash{pack("L", $key)} = md5_hex($derivation);
+    $hash{pack("L", $key)} = md5_hex($key.$value);
     # description
     $key = 0x40000002;
     $hash{pack("L", $key)} = "an example of list";
@@ -101,7 +92,7 @@ sub gen_dbm ($$) {
 }
 
 my ($element, $property, $resource, $path);
-my ($type, $derivation, $checksum, $description, $value);
+my ($type, $checksum, $description, $value);
 my ($string);
 
 my ($cm, $config, $cache_dir, $profile);
@@ -161,14 +152,9 @@ is($string, "/path/to/property", "Element->getPath()");
 $type = $element->getType();
 is($type, EDG::WP4::CCM::CacheManager::Element->STRING, "Element->getType()" );
 
-# test getDerivation()
-$derivation = $element->getDerivation();
-is($derivation, "lxplus.tpl,hardware.tpl,lxplust_025.tpl",
-   "Element->getDerivation()");
-
 # test getChecksum()
 $checksum = $element->getChecksum();
-is($checksum, md5_hex($derivation), "Element->getChecksum()");
+is($checksum, md5_hex($key.$value), "Element->getChecksum()");
 
 # test getDescription()
 $description = $element->getDescription();

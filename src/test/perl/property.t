@@ -29,7 +29,6 @@ sub gen_dbm
     my ($cache_dir, $profile) = @_;
     my (%hash);
     my ($key, $val, $active);
-    my ($derivation);
 
     # create new profile
     mkdir("$cache_dir");
@@ -52,19 +51,19 @@ sub gen_dbm
 
     tie(%hash, "DB_File", "${cache_dir}/${profile}/eid2data.db",
         &O_RDWR|&O_CREAT, 0644) or return();
+
     # value
     $key = 0x00000001;
     $hash{pack("L", $key)} = "a string";
+
     # type
     $key = 0x10000001;
     $hash{pack("L", $key)} = "string";
-    # derivation
-    $key = 0x20000001;
-    $derivation = "lxplus.tpl,hardware.tpl,lxplust_025.tpl";
-    $hash{pack("L", $key)} = $derivation;
+
     # checksum
     $key = 0x30000001;
-    $hash{pack("L", $key)} = md5_hex($derivation);
+    $hash{pack("L", $key)} = md5_hex($key$value);
+
     # description
     $key = 0x40000001;
     $hash{pack("L", $key)} = "an example of string";
@@ -102,13 +101,8 @@ is($getpath->toString(), "/path/to/element", "property Element->getPath()");
 # test getType()
 is($property->getType(), EDG::WP4::CCM::CacheManager::Element->STRING, "property Element->getType() is STRING");
 
-# test getDerivation()
-my $derivation = $property->getDerivation();
-is($derivation, "lxplus.tpl,hardware.tpl,lxplust_025.tpl",
-   "property Element->getDerivation()");
-
 # test getChecksum()
-is($property->getChecksum(), md5_hex($derivation), "property Element->getChecksum()");
+is($property->getChecksum(), md5_hex($key$value), "property Element->getChecksum()");
 
 # test getDescription()
 is($property->getDescription(), "an example of string", "property Element->getDescription()");
